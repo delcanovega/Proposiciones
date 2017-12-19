@@ -1,0 +1,2 @@
+# Proposiciones
+[UCM] PROGRAMACIÓN DECLARATIVA
