@@ -5,7 +5,6 @@
 
 type Var   = String  -- nombres de variables
 data FProp = V Var | No FProp | Y FProp FProp | O FProp FProp | Si FProp FProp | Sii FProp FProp
-    deriving (Eq, Ord)
 
 
 -- ===========================================
@@ -23,6 +22,22 @@ f5 = Y (V "p") (No (V "p"))
 -- ====            Instancias             ====
 -- ===========================================
 
+-- Igualdad estructural excepto en las operaciones /\ y \/,
+-- en las cuales el orden de los operandos no importa
+instance Eq FProp where
+    (V var1) == (V var2)                   = var1 == var2
+    (No prop1) == (No prop2)               = prop1 == prop2
+    (Y prop1 prop2) == (Y prop3 prop4)     = (prop1 == prop3 && prop2 == prop4) ||
+                                             (prop1 == prop4 && prop2 == prop3)
+    (O prop1 prop2) == (O prop3 prop4)     = (prop1 == prop3 && prop2 == prop4) ||
+                                             (prop1 == prop4 && prop2 == prop3)
+    (Si prop1 prop2) == (Si prop3 prop4)   = prop1 == prop3 && prop2 == prop4
+    (Sii prop1 prop2) == (Sii prop3 prop4) = prop1 == prop3 && prop2 == prop4
+
+-- Cuidado con el orden: a será menor que b si b -> a
+instance Ord FProp where
+    a <= b = consecuencia b a
+
 instance Show FProp where
     show (V var)           = var
     show (No fun)          = "~(" ++ show fun ++ ")"
@@ -31,14 +46,13 @@ instance Show FProp where
     show (Si prop1 prop2)  = "(" ++ show prop1 ++ ") -> (" ++ show prop2 ++ ")"
     show (Sii prop1 prop2) = "(" ++ show prop1 ++ ") <-> (" ++ show prop1 ++ ")"
 
--- TODO: instancias de Eq y Ord
-
 -- ===========================================
 -- ====      Funciones principales        ====
 -- ===========================================
 
--- Función envoltorio. Obtiene la lista completa de variables,
--- después las filtra eliminando las repetidas.
+-- Obtiene una lista con las distintas variables que contiene la fórmula
+-- · Primero obtiene la lista completa de variables (puede haber repeticiones)
+-- · Después las filtra eliminando las repetidas.
 vars :: FProp -> [Var]
 vars f = unique (getVars f)
 
