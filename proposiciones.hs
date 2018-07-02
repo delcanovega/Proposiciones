@@ -126,3 +126,34 @@ equiv f g vl = implies f g vl && implies g f vl
 -- Source: https://stackoverflow.com/a/29713381/7809508
 allPosibleValues :: [Var] -> [[(Var, Bool)]]
 allPosibleValues = foldr (\x xs -> (:) <$> [(x,True),(x,False)] <*> xs) [[]]
+
+
+-- ===========================================
+-- ====        Parte opcional: I/O        ====
+-- ===========================================
+
+main :: IO()
+main = do
+    putStrLn "Bienvenido al programa de evaluación de fórmulas lógicas v1.5"
+    
+    putStrLn "Menú:"
+    putStrLn "  1 - Información de uso"
+    putStrLn "  2 - Evaluación de fórmulas"
+    putStrLn "  0 - Salir"
+    n <- getInt
+    if n == 0 then
+        putStrLn "¡Hasta la próxima!"
+        return ()
+    else if n == 1 then
+        putStrLn "Las operaciones que podrás realizar dependerás del número de fórmulas:"
+        putStrLn "  · Si introduces una: comprobar si es satisfacctible, si se trata de una tautología o consultar su lista de variables"
+        putStrLn "  · Si introduces dos: comprobar si una es consecuencia de la otra o si son equivalentes"
+        putStrLn "  · Si introduces más de dos: consultar las consecuencias de cada una de ellas o dividirlas en particiones de funciones equivalentes"
+        putStrLn "Cada fórmula deberá ir en una línea y tendrá la forma ~p \\/ (p -> (q /\\ ~q))"
+        putStrLn "Introduce 0 cuando hayas acabado"
+    else if n == 2 then
+        -- TODO: introducir las fórmulas en una lista hasta que se introduzca 0
+        -- TODO: mostrar operaciones disponibles en función de la longitud de la lista
+        putStrLn "WIP"
+    else
+        putStrLn "Entrada no válida, finalizando programa"
