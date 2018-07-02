@@ -140,21 +140,29 @@ main = do
     putStrLn "  1 - Información de uso"
     putStrLn "  2 - Evaluación de fórmulas"
     putStrLn "  0 - Salir"
-    n <- getInt
-    if n == 0 then
+
+    putStr ">> "
+    n <- getLine
+    if n == "0" then do
         putStrLn "¡Hasta la próxima!"
         return ()
-    else if n == 1 then
+
+    else if n == "1" then do
         putStrLn "Las operaciones que podrás realizar dependerán del número de fórmulas:"
         putStrLn "  · Si introduces una: comprobar si es satisfactible, si se trata de una tautología o consultar su lista de variables"
         putStrLn "  · Si introduces dos: comprobar si una es consecuencia de la otra o si son equivalentes"
         putStrLn "  · Si introduces más de dos: consultar las consecuencias de cada una de ellas o dividirlas en particiones de funciones equivalentes"
         putStrLn "  · Si no introduces ninguna fórmula el programa finalizará"
-        putStrLn "Cada fórmula deberá ir en una línea y tendrá la forma ~p \\/ (p -> (q /\\ ~q))"
+        putStrLn "Cada fórmula deberá ir en una línea y tendrán la forma ~p \\/ (p -> (q /\\ ~q))"
         putStrLn "Introduce 0 cuando hayas acabado"
-    else if n == 2 then
-        -- TODO: introducir las fórmulas en una lista hasta que se introduzca 0
-        -- TODO: mostrar operaciones disponibles en función de la longitud de la lista
+
+    else if n == "2" then
+        -- TODO: crear una lista vacía
+        -- TODO: leer una linea y parsearla a FProp
+        -- TODO: añadirla a la lista y volver al paso 1
+
+        -- TODO: cuando se introduzca 0 mostrar operaciones disponibles en función de la longitud de la lista
         putStrLn "WIP"
+
     else
         putStrLn "Entrada no válida, finalizando programa"
