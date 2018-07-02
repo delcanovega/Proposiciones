@@ -145,10 +145,11 @@ main = do
         putStrLn "¡Hasta la próxima!"
         return ()
     else if n == 1 then
-        putStrLn "Las operaciones que podrás realizar dependerás del número de fórmulas:"
-        putStrLn "  · Si introduces una: comprobar si es satisfacctible, si se trata de una tautología o consultar su lista de variables"
+        putStrLn "Las operaciones que podrás realizar dependerán del número de fórmulas:"
+        putStrLn "  · Si introduces una: comprobar si es satisfactible, si se trata de una tautología o consultar su lista de variables"
         putStrLn "  · Si introduces dos: comprobar si una es consecuencia de la otra o si son equivalentes"
         putStrLn "  · Si introduces más de dos: consultar las consecuencias de cada una de ellas o dividirlas en particiones de funciones equivalentes"
+        putStrLn "  · Si no introduces ninguna fórmula el programa finalizará"
         putStrLn "Cada fórmula deberá ir en una línea y tendrá la forma ~p \\/ (p -> (q /\\ ~q))"
         putStrLn "Introduce 0 cuando hayas acabado"
     else if n == 2 then
