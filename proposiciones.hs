@@ -62,9 +62,13 @@ equivalente f g = all (== True) [equiv f g vl | vl <- allPosibleValues (unique (
 consecuencias :: [FProp] -> [(FProp, [FProp])]
 consecuencias fs = [(f, cs) | f <- fs, let cs = [c | c <- fs, c /= f && consecuencia f c], not (null cs)]
 
--- TODO: Divide la lista fs en sublistas con todos sus elementos equivalentes entre sí
---equivalentes :: [FProp] -> [[FProp]]
---equivalentes fs = [fs]
+-- Divide la lista fs en sublistas con todos sus elementos equivalentes entre sí
+-- · Para ello primero crea tantas listas de funciones equivalentes como funciones reciba,
+-- por ello si f y g son equivalentes ambas apareceran tanto en la lista de f como en la lista de g
+-- · Por último se eliminan los elementos repetidos de esta lista de listas,
+-- es decir, aquellas listas que ya tenemos de forma idéntica.
+equivalentes :: [FProp] -> [[FProp]]
+equivalentes fs = unique [[e | e <- fs, equivalente f e] | f <- fs]
 
 
 -- ===========================================
