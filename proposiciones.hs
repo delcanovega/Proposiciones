@@ -156,9 +156,13 @@ main = do
         putStrLn "Cada fórmula deberá ir en una línea y tendrán la forma ~p \\/ (p -> (q /\\ ~q))"
         putStrLn "Introduce 0 cuando hayas acabado"
 
-    else if n == "2" then
+    else if n == "2" then do
         -- TODO: crear una lista vacía
+        let fs = []
         -- TODO: leer una linea y parsearla a FProp
+        putStrLn "Introduce tu fórmula:"
+        f <- myReadLine
+        parseLine f fs
         -- TODO: añadirla a la lista y volver al paso 1
 
         -- TODO: cuando se introduzca 0 mostrar operaciones disponibles en función de la longitud de la lista
@@ -166,3 +170,15 @@ main = do
 
     else
         putStrLn "Entrada no válida, finalizando programa"
+
+myReadLine :: IO String
+myReadLine = do
+    putStr ">>"
+    f <- getLine
+    return (f)
+
+
+parseLine :: String -> [FProp] -> [FProp]
+parseLine f fs
+    | head f == 0 = fs
+    | head f == V = V tail f : fs
