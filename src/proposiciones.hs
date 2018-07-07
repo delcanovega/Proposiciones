@@ -59,20 +59,20 @@ vars f = unique (getVars f)
 
 -- Comprueba que, para cualquier combinación de valores posible, f siempre es True
 tautologia :: FProp -> Bool
-tautologia f = all (== True) [eval f vl | vl <- allPosibleValues (vars f)]
+tautologia f = all (== True) [eval f vl | vl <- allPossibleValues (vars f)]
 
 -- Comprueba que existe al menos una combinación de valores para la cual f es True
 satisfactible :: FProp -> Bool
-satisfactible f = True `elem` [eval f vl | vl <- allPosibleValues (vars f)]
+satisfactible f = True `elem` [eval f vl | vl <- allPossibleValues (vars f)]
 
 -- Para todos los valores con los que f es cierta, g debe serlo también (f -> g)
 -- La lista de variables sobre la que operar debe de ser las uniones de f y g.
 consecuencia :: FProp -> FProp -> Bool
-consecuencia f g = all (== True) [implies f g vl | vl <- allPosibleValues (unique (vars f ++ vars g))]
+consecuencia f g = all (== True) [implies f g vl | vl <- allPossibleValues (unique (vars f ++ vars g))]
 
 -- Para cualquier conjunto de valores, f y g deben tener el mismo resultado (f <-> g)
 equivalente :: FProp -> FProp -> Bool
-equivalente f g = all (== True) [equiv f g vl | vl <- allPosibleValues (unique (vars f ++ vars g))]
+equivalente f g = all (== True) [equiv f g vl | vl <- allPossibleValues (unique (vars f ++ vars g))]
 
 -- Devuelve una lista de pares (f, cs) siendo cs todas las funciones consecuencia de f
 consecuencias :: [FProp] -> [(FProp, [FProp])]
