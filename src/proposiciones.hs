@@ -132,5 +132,5 @@ equiv f g vl = implies f g vl && implies g f vl
 
 -- Genera todos los valores booleanos posibles para un conjunto de variables
 -- Fuente: https://stackoverflow.com/a/29713381/7809508
-allPosibleValues :: [Var] -> [[(Var, Bool)]]
-allPosibleValues = foldr (\x xs -> (:) <$> [(x,True),(x,False)] <*> xs) [[]]
+allPossibleValues :: [Var] -> [[(Var, Bool)]]
+allPossibleValues = foldr (\x xs -> (:) <$> [(x,True),(x,False)] <*> xs) [[]]
