@@ -14,7 +14,7 @@ data FProp = V Var | No FProp | Y FProp FProp | O FProp FProp | Si FProp FProp |
 f1 = Si (No (V "p")) (Si (V "p") (Y (V "q") (No (V "q"))))
 f2 = Y (V "p") (Si (No (V "q")) (No (V "p")))
 f3 = Y (Y (V "p") (V "q")) (O (No (V "q")) (V "r"))
-f4 = V "z"
+f4 = Sii (O (No (V "a")) (V "a")) (V "z")
 f5 = Y (V "p") (No (V "p"))
 
 
@@ -33,6 +33,7 @@ instance Eq FProp where
                                              (prop1 == prop4 && prop2 == prop3)
     (Si prop1 prop2) == (Si prop3 prop4)   = prop1 == prop3 && prop2 == prop4
     (Sii prop1 prop2) == (Sii prop3 prop4) = prop1 == prop3 && prop2 == prop4
+    p == p'                                = False
 
 -- Cuidado con el orden: a será menor que b si b -> a
 instance Ord FProp where
@@ -41,10 +42,10 @@ instance Ord FProp where
 instance Show FProp where
     show (V var)           = var
     show (No fun)          = "~(" ++ show fun ++ ")"
-    show (Y prop1 prop2)   = "(" ++ show prop1 ++ ") /\\ (" ++ show prop1 ++ ")"
-    show (O prop1 prop2)   = "(" ++ show prop1 ++ ") \\/ (" ++ show prop1 ++ ")"
+    show (Y prop1 prop2)   = "(" ++ show prop1 ++ ") /\\ (" ++ show prop2 ++ ")"
+    show (O prop1 prop2)   = "(" ++ show prop1 ++ ") \\/ (" ++ show prop2 ++ ")"
     show (Si prop1 prop2)  = "(" ++ show prop1 ++ ") -> (" ++ show prop2 ++ ")"
-    show (Sii prop1 prop2) = "(" ++ show prop1 ++ ") <-> (" ++ show prop1 ++ ")"
+    show (Sii prop1 prop2) = "(" ++ show prop1 ++ ") <-> (" ++ show prop2 ++ ")"
 
 -- ===========================================
 -- ====      Funciones principales        ====
@@ -65,6 +66,7 @@ satisfactible :: FProp -> Bool
 satisfactible f = True `elem` [eval f vl | vl <- allPosibleValues (vars f)]
 
 -- Para todos los valores con los que f es cierta, g debe serlo también (f -> g)
+-- La lista de variables sobre la que operar debe de ser las uniones de f y g.
 consecuencia :: FProp -> FProp -> Bool
 consecuencia f g = all (== True) [implies f g vl | vl <- allPosibleValues (unique (vars f ++ vars g))]
 
@@ -90,6 +92,7 @@ equivalentes fs = unique [[e | e <- fs, equivalente f e] | f <- fs]
 -- ===========================================
 
 -- Avanza recursivamente hasta encontrar las variables y las devuelve concatenadas
+-- Devuelve variables repetidas en caso de aparecer más de una vez
 getVars :: FProp -> [Var]
 getVars (V var)         = [var]
 getVars (No fun)        = getVars fun
@@ -99,12 +102,17 @@ getVars (Si fun1 fun2)  = getVars fun1 ++ getVars fun2
 getVars (Sii fun1 fun2) = getVars fun1 ++ getVars fun2
 
 -- Filtra una lista eliminando los elementos duplicados
--- Source: https://www.rosettacode.org/wiki/Remove_duplicate_elements#Haskell
+-- Para cada elemento añadido, lo concatena con la aplicación de unique sobre
+-- el resto de la lista, a excepción de las repeticiones del valor añadido
 unique :: Eq a => [a] -> [a]
 unique []       = []
-unique (x : xs) = x : unique (filter (x /=) xs)
+unique (x : xs) = x : unique [y | y <- xs, y /= x]
+-- Versión alternativa usando filter en lugar de listas intensionales
+-- unique (x : xs) = x : unique (filter (x /=) xs)
 
 -- Evalua una expresión en base a unos valores para sus variables
+-- Una vez llega al nivel de variable "itera" sobre la lista hasta
+-- encontrar su valor (p.ej. ("p", True))
 eval :: FProp -> [(Var, Bool)] -> Bool
 eval (V var) ((x, y):xs) | var == x  = y
                          | otherwise = eval (V var) xs
@@ -123,62 +131,6 @@ equiv :: FProp -> FProp -> [(Var, Bool)] -> Bool
 equiv f g vl = implies f g vl && implies g f vl
 
 -- Genera todos los valores booleanos posibles para un conjunto de variables
--- Source: https://stackoverflow.com/a/29713381/7809508
+-- Fuente: https://stackoverflow.com/a/29713381/7809508
 allPosibleValues :: [Var] -> [[(Var, Bool)]]
 allPosibleValues = foldr (\x xs -> (:) <$> [(x,True),(x,False)] <*> xs) [[]]
-
-
--- ===========================================
--- ====        Parte opcional: I/O        ====
--- ===========================================
-
-main :: IO()
-main = do
-    putStrLn "Bienvenido al programa de evaluación de fórmulas lógicas v1.5"
-    
-    putStrLn "Menú:"
-    putStrLn "  1 - Información de uso"
-    putStrLn "  2 - Evaluación de fórmulas"
-    putStrLn "  0 - Salir"
-
-    putStr ">> "
-    n <- getLine
-    if n == "0" then do
-        putStrLn "¡Hasta la próxima!"
-        return ()
-
-    else if n == "1" then do
-        putStrLn "Las operaciones que podrás realizar dependerán del número de fórmulas:"
-        putStrLn "  · Si introduces una: comprobar si es satisfactible, si se trata de una tautología o consultar su lista de variables"
-        putStrLn "  · Si introduces dos: comprobar si una es consecuencia de la otra o si son equivalentes"
-        putStrLn "  · Si introduces más de dos: consultar las consecuencias de cada una de ellas o dividirlas en particiones de funciones equivalentes"
-        putStrLn "  · Si no introduces ninguna fórmula el programa finalizará"
-        putStrLn "Cada fórmula deberá ir en una línea y tendrán la forma ~p \\/ (p -> (q /\\ ~q))"
-        putStrLn "Introduce 0 cuando hayas acabado"
-
-    else if n == "2" then do
-        -- TODO: crear una lista vacía
-        let fs = []
-        -- TODO: leer una linea y parsearla a FProp
-        putStrLn "Introduce tu fórmula:"
-        f <- myReadLine
-        parseLine f fs
-        -- TODO: añadirla a la lista y volver al paso 1
-
-        -- TODO: cuando se introduzca 0 mostrar operaciones disponibles en función de la longitud de la lista
-        putStrLn "WIP"
-
-    else
-        putStrLn "Entrada no válida, finalizando programa"
-
-myReadLine :: IO String
-myReadLine = do
-    putStr ">>"
-    f <- getLine
-    return (f)
-
-
-parseLine :: String -> [FProp] -> [FProp]
-parseLine f fs
-    | head f == 0 = fs
-    | head f == V = V tail f : fs
